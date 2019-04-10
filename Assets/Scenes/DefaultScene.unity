@@ -343,6 +343,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isFocusRequired: 0
+  updateInterval: 0.2
+  measurementsFilename: mihael_local
 --- !u!1 &1394513417
 GameObject:
   m_ObjectHideFlags: 0
