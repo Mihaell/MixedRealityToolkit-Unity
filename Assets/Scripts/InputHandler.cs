@@ -23,6 +23,11 @@ public class InputHandler : BaseInputHandler, IMixedRealityPointerHandler
         Debug.Log("Writing all data to: " + path);
     }
 
+    public void OnDestroy()
+    {
+        writer.Close();
+    }
+
     public void OnPointerClicked(MixedRealityPointerEventData eventData)
     {
         
@@ -58,7 +63,6 @@ public class InputHandler : BaseInputHandler, IMixedRealityPointerHandler
         Debug.Log("Data: " + data);
         writer.WriteLine(data);
         writer.Flush();
-        writer.Close();
         Debug.Log("Data written");
     }
 }
