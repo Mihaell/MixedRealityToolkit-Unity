@@ -398,7 +398,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isFocusRequired: 0
   updateInterval: 0.2
-  measurementsFilename: mihael
+  measurementsFilename: measurements
 --- !u!4 &2069305369
 Transform:
   m_ObjectHideFlags: 0

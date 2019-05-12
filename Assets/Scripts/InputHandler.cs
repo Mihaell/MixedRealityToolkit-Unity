@@ -13,6 +13,15 @@ public class InputHandler : BaseInputHandler, IMixedRealityPointerHandler
     public float updateInterval = 0.2F;
     public string measurementsFilename;
     private double lastInterval;
+    private StreamWriter writer;
+
+    public void Awake()
+    {
+        string timestamp = DateTime.Now.ToString("yyyy-MM-dd-HH-mm-ss");
+        string path = string.Format("{0}/{1}.txt", Application.persistentDataPath, measurementsFilename + "_" + timestamp);
+        writer = new StreamWriter(path, true);
+        Debug.Log("Writing all data to: " + path);
+    }
 
     public void OnPointerClicked(MixedRealityPointerEventData eventData)
     {
@@ -31,28 +40,22 @@ public class InputHandler : BaseInputHandler, IMixedRealityPointerHandler
         if (timeNow > lastInterval + updateInterval && eventData.Pointer.Result != null)
         {
             int step = eventData.Pointer.Result.RayStepIndex;
-            string data = MixedRealityToolkit.InputSystem.GazeProvider.HitPosition.ToString("F6");
-            string path = string.Format("{0}/{1}.txt", Application.persistentDataPath, measurementsFilename);
+            string selectionPosition = MixedRealityToolkit.InputSystem.GazeProvider.HitPosition.ToString("F6");
+            string hololensPosition = MixedRealityToolkit.InputSystem.GazeProvider.GazeOrigin.ToString("F6");
+            string data = hololensPosition + " " + selectionPosition;
+            print(data);
 
-            //foreach (var ray in eventData.Pointer.Rays)
-            //{
-            //    Debug.Log(ray.Origin.ToString() + "  " + ray.Terminus.ToString());
-            //}
-            //Debug.Log(eventData.Pointer.Position.ToString() + "  (1)");
-
-            var action = new Action<string, string>(SaveDataToDisc);
-            action.BeginInvoke(path, data, null, null);
+            var action = new Action<string>(this.SaveDataToDisc);
+            action.BeginInvoke(data, null, null);
 
             lastInterval = timeNow;
         }
     }
 
-    private static void SaveDataToDisc(string path, string data)
+    private void SaveDataToDisc(string data)
     {
         // Append the point to the specified file
-        StreamWriter writer = new StreamWriter(path, true);
         Debug.Log("Data: " + data);
-        Debug.Log("Writing data to: " + path);
         writer.WriteLine(data);
         writer.Flush();
         writer.Close();
