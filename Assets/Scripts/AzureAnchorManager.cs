@@ -97,8 +97,14 @@ public class AzureAnchorManager : BaseInputHandler, IMixedRealitySpeechHandler
 
     void OnError(object sender, SessionErrorEventArgs args)
     {
-        /*Debug.Log("Greska " + args.ToString());
-        debugText.text = "Greska " + args.ToString();*/
+        UnityEngine.WSA.Application.InvokeOnAppThread(
+                    () =>
+                    {
+                        Debug.Log("Greska " + args.ErrorMessage);
+                        debugText.text = "Greska " + args.ErrorMessage;
+                    },
+                    false
+        );
     }
 
     void OnAnchorLocated(object sender, AnchorLocatedEventArgs args)
@@ -108,11 +114,12 @@ public class AzureAnchorManager : BaseInputHandler, IMixedRealitySpeechHandler
         switch (args.Status)
         {
             case LocateAnchorStatus.Located:
-                /*Debug.Log("Anchor located");
+                /*
                 debugText.text = "Anchor located";*/
                 UnityEngine.WSA.Application.InvokeOnAppThread(
                     () =>
                     {
+                        Debug.Log("Anchor located");
                         var cube = GameObject.CreatePrimitive(PrimitiveType.Cube);
 
                         cube.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
@@ -133,19 +140,37 @@ public class AzureAnchorManager : BaseInputHandler, IMixedRealitySpeechHandler
                 // Go add your anchor to the scene...
                 break;
             case LocateAnchorStatus.AlreadyTracked:
-                /*Debug.Log("Anchor already tracked");
-                debugText.text = "Anchor already tracked";*/
+                UnityEngine.WSA.Application.InvokeOnAppThread(
+                    () =>
+                    {
+                        Debug.Log("Anchor already tracked");
+                        debugText.text = "Anchor already tracked";
+                    },
+                    false
+                );
                 // This anchor has already been reported and is being tracked
                 break;
             case LocateAnchorStatus.NotLocatedAnchorDoesNotExist:
-                /*Debug.Log("Anchor doesn't exist");
-                debugText.text = "Anchor doesn't exist";*/
+                UnityEngine.WSA.Application.InvokeOnAppThread(
+                    () =>
+                    {
+                        Debug.Log("Anchor doesn't exist");
+                        debugText.text = "Anchor doesn't exist";
+                    },
+                    false
+                );
                 // The anchor was deleted or never existed in the first place
                 // Drop it, or show UI to ask user to anchor the content anew
                 break;
             case LocateAnchorStatus.NotLocated:
-                /*Debug.Log("Anchor not located");
-                debugText.text = "Anchor not located";*/
+                UnityEngine.WSA.Application.InvokeOnAppThread(
+                    () =>
+                    {
+                        Debug.Log("Anchor not located");
+                        debugText.text = "Anchor not located";
+                    },
+                    false
+                );
                 // The anchor hasn't been found given the location data
                 // The user might in the wrong location, or maybe more data will help
                 // Show UI to tell user to keep looking around
@@ -200,24 +225,27 @@ public class AzureAnchorManager : BaseInputHandler, IMixedRealitySpeechHandler
     {
         Debug.Log("Reloading cubes");
         debugText.text = "Reloading cubes";
-        if (this.cubes.Count > 0)
-        {
-            var identifiers = this.cubes.Select(c => c.name).ToArray();
+        //if (this.cubes.Count > 0)
+        //{
+        //var identifiers = this.cubes.Select(c => c.name).ToArray();
+            //var identifiers = new string[0];
             string all_ids = "";
 
-            foreach (string id in identifiers)
+            /*foreach (string id in identifiers)
             {
                 all_ids += id + "\n";
-            }
+            }*/
 
             await this.OnClearCubesAsync();
 
             Debug.Log("Creating watchers: " + all_ids);
             debugText.text = "Creating watchers: " + all_ids;
-            var watcher = this.cloudSpatialAnchorSession.CreateWatcher(
+
+            var identifiers = new string[0];
+            this.cloudSpatialAnchorSession.CreateWatcher(
                 new AnchorLocateCriteria()
                 {
-                    Identifiers = identifiers,
+                    Identifiers = null,
                     BypassCache = true,
                     RequestedCategories = AnchorDataCategory.Spatial,
                     Strategy = LocateStrategy.AnyStrategy
@@ -225,7 +253,7 @@ public class AzureAnchorManager : BaseInputHandler, IMixedRealitySpeechHandler
             );
             Debug.Log("Watchers created");
             debugText.text = "Watchers created";
-        }
+        //}
     }
 
     async Task OnClearCubesAsync()
